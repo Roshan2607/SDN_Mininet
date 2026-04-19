@@ -178,27 +178,44 @@ cookie=0x0, arp actions=FLOOD
 ## Proof of Execution
 
 ### Screenshot 1 — Controller Startup & Flow Rule Installation
+<img width="940" height="642" alt="image" src="https://github.com/user-attachments/assets/7e090390-1e0d-42ac-8075-ab2fd3da81b3" />
+
 POX connects to all 3 switches and installs IP forwarding rules and ARP flood rules on each via ConnectionUp event.
 
 ### Screenshot 2 — Scenario 1: Normal Forwarding (0% loss)
+<img width="940" height="237" alt="image" src="https://github.com/user-attachments/assets/c0c55ea9-22a0-4efa-afaf-4b9d6877591d" />
+
 `pingall` confirms all host pairs can communicate — 6/6 packets received.
 
 ### Screenshot 3 — Scenario 2: Failure Test (100% loss)
+<img width="940" height="441" alt="image" src="https://github.com/user-attachments/assets/4d5f9132-8156-403a-ad77-3e7e0e20ce00" />
+
 Flow rules manually deleted from all switches using `ovs-ofctl del-flows`. Subsequent `pingall` shows 100% packet loss confirming rules are essential.
 
 ### Screenshot 4 — Controller Restart & Rule Reinstallation
+<img width="940" height="672" alt="image" src="https://github.com/user-attachments/assets/b5b3fccf-0a45-436c-93b9-e17850004d48" />
+
 POX controller restarted. All 3 switches reconnect and receive fresh flow rules automatically via ConnectionUp.
 
 ### Screenshot 5 — Regression Test Passed (0% loss restored)
+<img width="940" height="355" alt="image" src="https://github.com/user-attachments/assets/819c4a55-9ca0-4b43-bfc2-c7dce46ad33c" />
+
 `pingall` after controller restart shows 0% loss again — confirming static routing paths are correctly restored.
 
 ### Screenshot 6 — Flow Tables (all 3 switches)
+<img width="940" height="301" alt="image" src="https://github.com/user-attachments/assets/985422bd-90e1-4b29-b017-b961c579d5a4" />
+
 `ovs-ofctl dump-flows` shows exact flow entries on s1, s2, s3 with packet/byte counters confirming traffic matched the rules.
 
 ### Screenshot 7 — iperf Throughput
+<img width="940" height="308" alt="image" src="https://github.com/user-attachments/assets/92141e67-9adf-4e0b-8529-f167283476be" />
+
 TCP bandwidth test between h1 and h2 shows 25.9 Gbits/sec confirming correct end-to-end data plane forwarding.
 
 ### Screenshot 8 — tcpdump Packet Capture
+<img width="940" height="209" alt="image" src="https://github.com/user-attachments/assets/0416d12d-bac3-4247-8c50-11eea4595e22" />
+<img width="940" height="484" alt="image" src="https://github.com/user-attachments/assets/26e11c51-f6d3-4f59-9390-ca1ae61c715e" />
+
 tcpdump capture on all interfaces shows ICMP echo request (10.0.0.1 → 10.0.0.2) traversing s1→s2→s3 and ICMP echo reply (10.0.0.2 → 10.0.0.1) returning along the same path, confirming correct static flow rule installation and end-to-end packet delivery.
 
 ---
